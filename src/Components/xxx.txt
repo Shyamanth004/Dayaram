@@ -1,0 +1,548 @@
+import React, { useState, useEffect } from 'react';
+import { useSwipeable } from 'react-swipeable';
+import Navbar from "../Components/Navbar";
+import Header from "../Components/Header";
+import { Link, useNavigate } from 'react-router-dom';
+import Footer from '../Components/Footer';
+import Data from './Data';  // Import the Data
+
+const Home = () => {
+  // Services (unchanged)
+  const services = [
+    { id: 1, name: "Odhis' Chenna Pudo", image: "/p1.jpg" },
+    { id: 2, name: "Bengali Rasgulla", image: "/p2.jpg" },
+    { id: 3, name: "Punjabi Kaju Katli", image: "/p3.jpg" },
+    { id: 4, name: "Kakinada Kaja", image: "/p4.jpg" },
+    { id: 5, name: "Mathuras' Peda", image: "/p5.jpg" },
+    { id: 6, name: "Rajasthani Laddu", image: "/p6.jpg" }
+  ];
+
+  const productCategories = [
+    { id: 1, name: "Cakes", image: "/cat1.jpg" }, // replace with actual image paths
+    { id: 2, name: "Ice Cream", image: "/cat2.jpg" },
+    { id: 3, name: "Dry Fruits", image: "/cat3.jpg" },
+    { id: 4, name: "Biscuits", image: "/cat4.jpg" },
+    { id: 5, name: "Fast Food", image: "/cat5.jpg" },
+    { id: 6, name: "Juices", image: "/cat6.jpg" },
+  ];
+
+  const bestSellingProducts = Data.filter((product) => product.rating >= 4.5);  // Filter best-selling products
+
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth); // Track screen width
+
+  const navigate = useNavigate();
+
+  const handleNext = () => {
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % bestSellingProducts.length);
+  };
+
+  const handlePrev = () => {
+    setCurrentIndex((prevIndex) => (prevIndex - 1 + bestSellingProducts.length) % bestSellingProducts.length);
+  };
+
+  // Swiping handlers
+  const handlers = useSwipeable({
+    onSwipedLeft: handleNext,
+    onSwipedRight: handlePrev,
+  });
+
+  const handleProductClick = (id) => {
+    navigate(`/product/${id}`);
+  };
+
+  const [scrollNav, setScrollNav] = useState(false);
+
+  const changeNavBackground = () => {
+    if (window.scrollY >= 10) {
+      setScrollNav(true);
+    } else {
+      setScrollNav(false);
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("scroll", changeNavBackground);
+    return () => {
+      window.removeEventListener("scroll", changeNavBackground);
+    };
+  }, []);
+
+  const handleScrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Update window width on resize
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
+  return (
+    <div>
+      <Navbar />
+      <div>
+        <Header /><br />
+
+        {/* Best Selling Products Section */}
+        <section className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center relative">
+          <h2 className="permanent-marker-regular tracking-wider text-2xl sm:text-3xl lg:text-4xl font-bold mb-12">Our Best Sellers</h2>
+
+          <div {...handlers} className="relative">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 p-8 bg-[#faf2dd]">
+              {/* Conditionally show 1 product in mobile, 3 products in large screens */}
+              {bestSellingProducts.slice(currentIndex, currentIndex + (windowWidth < 768 ? 1 : 3)).map((best) => (
+                <div
+                  key={best.id}
+                  className="relative group w-[350px] p-1 mx-auto  overflow-hidden transform transition duration-500 ease-in-out hover:shadow-xl"
+                >
+                  <img
+                    src={best.image}
+                    alt={best.name}
+                    className="w-full h-56 mb-4 object-cover rounded-lg"
+                  />
+                  <h1 className="rubik-bubbles-regular text-left text-2xl mb-1">{best.name}</h1>
+                  <h2 className="text-left text-amber-500 mb-1">{best.price}</h2>
+                  {/* Display Star Rating */}
+                  <div className="text-left px-1 w-[50px] rounded-full text-white bg-amber-500 mb-4">
+                    <h1>{best.rating} ★</h1>
+                  </div>
+                  <p className='playpen-sans-text text-left mb-16'>{best.description}</p>
+                  <button
+                    onClick={() => handleProductClick(best.id)}
+                    className="fixed w-full h-12 rounded-full text-white bg-[#F4C430] hover:underline bottom-1 left-0"
+                  >
+                    Shop Now
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            {/* Navigation Buttons */}
+            <div className="absolute top-1/2 left-0 transform -translate-y-1/2">
+              <button onClick={handlePrev} className="mx-2 px-4 py-2 lg:-translate-x-12 bg-[#F4C430] text-white rounded-full lg:hover:bg-[#DAA520] sm:active:bg-[#DAA520]">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M7.82843 10.9999H20V12.9999H7.82843L13.1924 18.3638L11.7782 19.778L4 11.9999L11.7782 4.22168L13.1924 5.63589L7.82843 10.9999Z"></path></svg>
+              </button>
+            </div>
+            <div className="absolute top-1/2 right-0 transform -translate-y-1/2">
+              <button onClick={handleNext} className="mx-2 px-4 py-2 lg:translate-x-12 bg-[#F4C430] text-white rounded-full hover:bg-[#DAA520]">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"></path></svg>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        {/* Trust Section */}
+        <section className="py-12 px-4 sm:px-6 lg:px-8 text-center">
+          <div className="max-w-7xl mx-auto">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-semibold mb-20">You Can Trust Us</h1>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 justify-items-center">
+              {/* Icon 1 */}
+              <div className="flex flex-col items-center">
+                <img src="/since.png" alt="Since 1975" className="w-20 h-20 mb-4" />
+                <p className="text-lg font-medium">Since 1975</p>
+              </div>
+
+              {/* Icon 2 */}
+              <div className="flex flex-col items-center">
+                <img src="/makeinindia.jpg" alt="Make in India" className="w-36 h-20 mb-4" />
+                <p className="text-lg font-medium">Make in India</p>
+              </div>
+
+              {/* Icon 3 */}
+              <div className="flex flex-col items-center">
+                <img src="/eco.jpg" alt="Eco Friendly" className="w-24 h-20 mb-4" />
+                <p className="text-lg font-medium">Eco Friendly</p>
+              </div>
+
+              {/* Icon 4 */}
+              <div className="flex flex-col items-center">
+                <img src="/iso.jpg" alt="ISO Certified" className="w-20 h-20 mb-4" />
+                <p className="text-lg font-medium">ISO Certified</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+        {/* Main Services Section */}
+        <section
+          className="relative py-12 px-4 sm:px-6 lg:px-8 mb-16"
+          style={{
+            backgroundImage: `url('/pr.jpg')`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        >
+          <div className="absolute inset-0 bg-black bg-opacity-60 backdrop-blur-sm"></div>
+
+          <div className="relative max-w-7xl mx-auto text-center z-10">
+            <h2 className="permanent-marker-regular tracking-wider text-2xl sm:text-3xl lg:text-4xl font-bold mb-20 text-white">
+              Discover India’s Sweet Delights!
+            </h2>
+
+            {/* Grid for large screens */}
+            <div className="hidden lg:grid grid-cols-3 gap-12">
+              {services.map((service) => (
+                <div
+                  key={service.id}
+                  className="relative group w-64 h-64 mx-auto mb-12 rounded-full overflow-hidden shadow-lg transform transition duration-500 ease-in-out hover:scale-110"
+                >
+                  <img
+                    src={service.image}
+                    alt={service.name}
+                    className="w-full h-full object-cover rounded-full"
+                  />
+                  <div className="absolute inset-0 bg-black bg-opacity-70 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-500">
+                    <div className="text-center text-white p-4">
+                      <h1 className="text-xl font-bold mb-8">{service.name}</h1>
+                      <Link
+                        to="./varieties"
+                        className="mt-4 px-6 py-2 bg-[#F4C430] text-white rounded-lg hover:bg-[#DAA520]"
+                      >
+                        Explore More
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Flexbox for small screens with horizontal scrolling */}
+            <div className="lg:hidden flex gap-4 overflow-x-scroll no-scrollbar scroll-smooth snap-x">
+              <div className="grid grid-cols-3 gap-4 min-w-[900px] snap-center">
+                {services.map((service) => (
+                  <div
+                    key={service.id}
+                    className="flex-shrink-0 relative group w-56 h-56 mx-auto mb-12 rounded-full overflow-hidden shadow-lg transform transition duration-500 ease-in-out hover:scale-110"
+                  >
+                    <img
+                      src={service.image}
+                      alt={service.name}
+                      className="w-full h-full object-cover rounded-full"
+                    />
+                    <div className="absolute inset-0 bg-black bg-opacity-70 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-500">
+                      <div className="text-center text-white p-4">
+                        <h1 className="text-xl font-bold mb-8">{service.name}</h1>
+                        <Link
+                          to="./varieties"
+                          className="mt-4 px-6 py-2 bg-[#F4C430] text-white rounded-lg hover:bg-[#DAA520]"
+                        >
+                          Explore More
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+        <section className="relative py-10 px-4 sm:px-6 lg:px-8 mb-16">
+          <div className="max-w-7xl p-10 mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center bg-[#faf2dd]">
+            {/* Text Content */}
+            <div className="text-center md:text-left">
+              <h2 className="permanent-marker-regular text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-800 mb-8">
+                Sugar-Free Sweets for All!
+              </h2>
+              <p className="playpen-sans-text text-gray-700 text-lg lg:text-xl mb-8">
+                Now your sugar level can't stop you from indulging in our delicious sweets. Enjoy a range of sugar-free delicacies!
+              </p>
+              <Link
+                to="/sugarfree"
+                className="inline-block bg-[#F4C430] text-white py-3 px-8 text-lg rounded-full hover:bg-[#DAA520] transition duration-300">
+                Explore Sugar-Free Sweets
+              </Link>
+            </div>
+            {/* Image Content */}
+            <div className="flex justify-center md:justify-end">
+              <img
+                src="/sugar.jpg"
+                alt="Sugar-Free Sweets"
+                className="w-full h-auto max-w-md rounded-lg shadow-lg"
+              />
+            </div>
+          </div>
+        </section>
+        <section className="pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center">
+          <h2 className="permanent-marker-regular tracking-wider text-2xl sm:text-3xl lg:text-4xl font-bold mb-16">
+            Discover Our Sweet Selections!
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 p-10 gap-4 bg-[#faf2dd]">
+            {productCategories.map((category) => (
+              <div
+                key={category.id}
+                className="relative group w-full p-2 mx-auto mb- overflow-hidden rounded-lg bg-white shadow-lg transform transition duration-500 ease-in-out hover:scale-105"
+              >
+                <img
+                  src={category.image}
+                  alt={category.name}
+                  className="w-full h-60 mb-4 object-cover rounded-lg"
+                />
+                <button
+                    className="fixed w-1/2 h-12 rounded-full text-amber-500 bg-white border border-amber-500 hover:underline bottom-1 left-1/4"
+                  >
+                    Shop Now
+                  </button>
+              </div>
+            ))}
+          </div>
+        </section>
+        <Footer />
+        <button
+          onClick={handleScrollToTop}
+          className={`${scrollNav ? "block" : "hidden"
+            } fixed bottom-4 right-4 bg-[#F4C430] text-white rounded-full p-3 shadow-lg hover:bg-[#DAA520]`}
+          style={{ zIndex: 1000 }} // Ensure the button is on top
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="rgba(255,255,255,1)"><path d="M13.0001 7.82843V20H11.0001V7.82843L5.63614 13.1924L4.22192 11.7782L12.0001 4L19.7783 11.7782L18.3641 13.1924L13.0001 7.82843Z"></path></svg>
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default Home;
+
+import React from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faInstagram, faFacebook, faXTwitter, faLinkedin, faYoutube } from "@fortawesome/free-brands-svg-icons";
+import { Link } from "react-router-dom";
+
+const Footer = () => {
+  return (
+    <footer className="bg-[#F4C430] text-white py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-start">
+
+        {/* Left Section with Logo and FSSAI Mark */}
+        <div className="flex flex-col items-start sm:items-center mb-6 sm:mb-0">
+          <div className="flex items-center mb-4">
+            <img
+              src="/logo.png"
+              alt="Brand Logo"
+              className="h-28 w-auto"
+            />
+            <span className="ml-2 text-xl font-bold text-black">Dayaram Sweets</span>
+          </div>
+
+          <div className="mt-2">
+            <img
+              src="/fssai.png"
+              alt="FSSAI Mark"
+              className="h-10 w-auto"
+            />
+          </div>
+        </div>
+
+        {/* Right Section with Links and Social Media */}
+        <div className="flex flex-col items-start w-full sm:w-auto">
+          {/* Quick Links and Conditions */}
+          <h2 className="font-bold text-xl text-black mb-4">Quick Links and Conditions</h2>
+
+          {/* Links Section */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 border-t border-white pt-4">
+            {/* Portal Links */}
+            <div>
+              <h3 className="font-bold text-lg text-black mb-4">Portal</h3>
+              <ul className="space-y-2">
+                <li>
+                  <Link
+                    to="/"
+                    className="text-white hover:underline"
+                  >
+                    Home
+                  </Link>
+                </li>
+                <li><Link
+                  to="/about"
+                  className="text-white hover:underline"
+                >
+                  About
+                </Link></li>
+                <li><Link
+                  to="/varieties"
+                  className="text-white hover:underline"
+                >
+                  Search
+                </Link></li>
+                <li><Link
+                  to="/contact"
+                  className="text-white hover:underline"
+                >
+                  Contact
+                </Link></li>
+              </ul>
+            </div>
+
+            {/* Products Links */}
+            <div>
+              <h3 className="font-bold text-lg text-black mb-4">Products</h3>
+              <ul className="space-y-2">
+                <li><Link
+                  to="/cakes"
+                  className="text-white hover:underline"
+                >
+                  Cakes
+                </Link></li>
+                <li><Link
+                  to="/icecream"
+                  className="text-white hover:underline"
+                >
+                  Ice Cream
+                </Link></li>
+                <li><Link
+                  to="/dryfruits"
+                  className="text-white hover:underline"
+                >
+                  Dry Fruits
+                </Link></li>
+                <li><Link
+                  to="/biscuits"
+                  className="text-white hover:underline"
+                >
+                  Biscuits
+                </Link></li>
+                <li><Link
+                  to="/fastfood"
+                  className="text-white hover:underline"
+                >
+                  Fast Food
+                </Link></li>
+                <li><Link
+                  to="/drinks"
+                  className="text-white hover:underline"
+                >
+                  Drinks
+                </Link></li>
+              </ul>
+            </div>
+
+            {/* Legal Links */}
+            <div>
+              <h3 className="font-bold text-lg text-black mb-4">Legal</h3>
+              <ul className="space-y-2">
+                <li><Link
+                  to="/termsandconditions"
+                  className="text-white hover:underline"
+                >
+                  Terms and Conditions
+                </Link></li>
+                <li><Link
+                  to="/privacy"
+                  className="text-white hover:underline"
+                >
+                  Privacy Policy
+                </Link></li>
+                <li><Link
+                  to="/returnandexchange"
+                  className="text-white hover:underline"
+                >
+                  Return and Exchange Policy
+                </Link></li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Social Media Links */}
+          <div className="mt-6 sm:mt-8">
+            <div className="flex justify-start space-x-6">
+              <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer" className="text-gray-100 hover:text-white">
+                <FontAwesomeIcon icon={faInstagram} className="h-6 w-6" />
+              </a>
+              <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" className="text-gray-100 hover:text-white">
+                <FontAwesomeIcon icon={faFacebook} className="h-6 w-6" />
+              </a>
+              <a href="https://www.twitter.com" target="_blank" rel="noopener noreferrer" className="text-gray-100 hover:text-white">
+                <FontAwesomeIcon icon={faXTwitter} className="h-6 w-6" />
+              </a>
+              <a href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer" className="text-gray-100 hover:text-white">
+                <FontAwesomeIcon icon={faLinkedin} className="h-6 w-6" />
+              </a>
+              <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer" className="text-gray-100 hover:text-white">
+                <FontAwesomeIcon icon={faYoutube} className="h-6 w-6" />
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer Text */}
+      <div className="border-t border-white mt-6 pt-4">
+        <p className="text-center text-sm sm:text-base text-black">
+          © 2024 Dayaram Sweets | All rights reserved | Powered by SKS Web Services
+        </p>
+      </div>
+    </footer>
+  );
+};
+
+export default Footer;
+
+import React from "react";
+import Navbar from "../Components/Navbar";
+import Footer from "../Components/Footer";
+
+const About = () => {
+  const aboutBlocks = [
+    {
+      image: "/ab1.jpg",
+      title: "Our Mission",
+      description:
+        "At Sugary Trails, we promise more than confections. We promise memories. Whether you’re celebrating a birthday, a promotion, or simply the joy of being alive, our sweets are there to sweeten the moment. And as you leave, clutching a pink box tied with satin ribbon, you’ll carry a piece of our warmth with you.",
+    },
+    {
+      image: "/ab2.jpg",
+      title: "Our Vision",
+      description:
+        "In the cozy kitchen, the air thick with anticipation, generations gather. Children perch on countertops, eyes wide as they watch flour transform into dough. Grandparents, their hands weathered and wise, measure spices by intuition. And in the center of it all—the heart of the home—sits a platter of sweets.",
+    },
+    {
+      image: "/ab3.jpg",
+      title: "Our Values",
+      description:
+        "Step inside our cozy haven, and you’ll find shelves adorned with colorful jars of jalebis, trays of buttery pedas, and stacks of fragrant coconut laddoos. Whether you’re celebrating a special occasion or simply craving a sweet escape, Siblings’ Sweet Haven promises to make your heart a little lighter and your taste buds dance with joy.",
+    },
+  ];
+
+  return (
+    <>
+      <Navbar />
+      <div className="min-h-screen bg-gray-100">
+        <div className="py-24 bg-[#F4C430]">
+          <h2 className="text-3xl sm:text-3xl lg:text-5xl font-bold text-center">About Us</h2>
+        </div>
+        <section className="py-16 max-w-7xl mx-auto">
+
+          {aboutBlocks.map((block, index) => (
+            <div
+              key={index}
+              className={`flex flex-col lg:flex-row items-center justify-between mb-12 lg:mb-24 ${index % 2 === 1 ? "lg:flex-row-reverse" : ""
+                }`}
+            >
+              <div className="w-[95%] lg:w-1/2 h-64 lg:h-80 overflow-hidden rounded-lg shadow-lg transform transition-transform duration-700 ease-in-out hover:scale-105 animate-slide-In">
+                <img
+                  src={block.image}
+                  alt={block.title}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+
+              <div className="w-full lg:w-1/2 lg:pl-8 mt-8 lg:mt-0 text-center lg:text-left">
+                <h3 className="text-2xl font-bold mb-4 animate-fade-in">{block.title}</h3>
+                <p className="playpen-sans-text text-lg px-2 lg:px-0 lg:pr-3 text-gray-700 animate-fade-in">{block.description}</p>
+              </div>
+            </div>
+          ))}
+        </section>
+      </div>
+      <Footer />
+    </>
+  );
+};
+
+export default About;
