@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -41,21 +41,40 @@ const About = () => {
     { coords: [17.738279033374354, 83.31247342447398], name: "Branch 2" },
     { coords: [17.73715120923901, 83.32183755331033], name: "Branch 3" },
   ];
+  const [scrollNav, setScrollNav] = useState(false);
+
+  const changeNavBackground = () => {
+    if (window.scrollY >= 1) {
+      setScrollNav(true);
+    } else {
+      setScrollNav(false);
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("scroll", changeNavBackground);
+    return () => {
+      window.removeEventListener("scroll", changeNavBackground);
+    };
+  }, []);
+
+  const handleScrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
     <>
       <Navbar />
       <div className="min-h-screen bg-white">
-        <div className="py-10 bg-[#F4C430]"> 
+        <div className="py-10 bg-[#F4C430]">
         </div>
 
         <section className="py-16 max-w-7xl mx-auto">
           {aboutBlocks.map((block, index) => (
             <div
               key={index}
-              className={`flex flex-col lg:flex-row items-center justify-between mb-12 lg:mb-24 ${
-                index % 2 === 1 ? "lg:flex-row-reverse" : ""
-              }`}
+              className={`flex flex-col lg:flex-row items-center justify-between mb-12 lg:mb-24 ${index % 2 === 1 ? "lg:flex-row-reverse" : ""
+                }`}
             >
               <div className="w-[95%] lg:w-1/2 h-64 lg:h-80 overflow-hidden rounded-lg shadow-lg transform transition-transform duration-700 ease-in-out hover:scale-105 animate-slide-In">
                 <img src={block.image} alt={block.title} className="w-full h-full object-cover" />
@@ -70,36 +89,36 @@ const About = () => {
           ))}
           {/* Trust Section */}
           <section className="py-16 mb-16 px-4 sm:px-6 lg:px-8 text-center">
-                <div className="max-w-7xl mx-auto">
-                    <h1 className="text-xl sm:text-2xl lg:text-3xl font-semibold mb-20">You Can Trust Us</h1>
+            <div className="max-w-7xl mx-auto">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-semibold mb-20">You Can Trust Us</h1>
 
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 justify-items-center">
-                        {/* Icon 1 */}
-                        <div className="flex flex-col items-center">
-                            <img src="/since.png" alt="Since 1975" className="w-20 h-20 mb-4" />
-                            <p className="text-lg font-medium">Since 1975</p>
-                        </div>
-
-                        {/* Icon 2 */}
-                        <div className="flex flex-col items-center">
-                            <img src="/makeinindia.jpg" alt="Make in India" className="w-36 h-20 mb-4" />
-                            <p className="text-lg font-medium">Make in India</p>
-                        </div>
-
-                        {/* Icon 3 */}
-                        <div className="flex flex-col items-center">
-                            <img src="/eco.jpg" alt="Eco Friendly" className="w-24 h-20 mb-4" />
-                            <p className="text-lg font-medium">Eco Friendly</p>
-                        </div>
-
-                        {/* Icon 4 */}
-                        <div className="flex flex-col items-center">
-                            <img src="/iso.jpg" alt="ISO Certified" className="w-20 h-20 mb-4" />
-                            <p className="text-lg font-medium">ISO Certified</p>
-                        </div>
-                    </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 justify-items-center">
+                {/* Icon 1 */}
+                <div className="flex flex-col items-center">
+                  <img src="/since.png" alt="Since 1975" className="w-20 h-20 mb-4" />
+                  <p className="text-lg font-medium">Since 1975</p>
                 </div>
-            </section>
+
+                {/* Icon 2 */}
+                <div className="flex flex-col items-center">
+                  <img src="/makeinindia.jpg" alt="Make in India" className="w-36 h-20 mb-4" />
+                  <p className="text-lg font-medium">Make in India</p>
+                </div>
+
+                {/* Icon 3 */}
+                <div className="flex flex-col items-center">
+                  <img src="/eco.jpg" alt="Eco Friendly" className="w-24 h-20 mb-4" />
+                  <p className="text-lg font-medium">Eco Friendly</p>
+                </div>
+
+                {/* Icon 4 */}
+                <div className="flex flex-col items-center">
+                  <img src="/iso.jpg" alt="ISO Certified" className="w-20 h-20 mb-4" />
+                  <p className="text-lg font-medium">ISO Certified</p>
+                </div>
+              </div>
+            </div>
+          </section>
 
           {/* Tribute Section */}
           <div className="flex flex-col lg:flex-row items-center justify-between my-12 lg:my-24 p-8 bg-[#faf2dd]">
@@ -137,6 +156,14 @@ const About = () => {
           </div>
         </section>
       </div>
+      <button
+        onClick={handleScrollToTop}
+        className={`${scrollNav ? "block" : "hidden"
+          } fixed bottom-4 right-4 bg-[#F4C430] text-white rounded-full p-3 shadow-lg hover:bg-[#DAA520]`}
+        style={{ zIndex: 1000 }} // Ensure the button is on top
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="rgba(255,255,255,1)"><path d="M13.0001 7.82843V20H11.0001V7.82843L5.63614 13.1924L4.22192 11.7782L12.0001 4L19.7783 11.7782L18.3641 13.1924L13.0001 7.82843Z"></path></svg>
+      </button>
       <Footer />
     </>
   );
