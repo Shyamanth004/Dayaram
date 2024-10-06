@@ -1,8 +1,28 @@
-import React from "react";
+import React, { useState, useEffect } from 'react';
 import Navbar from "../Components/Navbar";
 import Footer from "../Components/Footer";
 
 const ReturnExchangePolicy = () => {
+  const [scrollNav, setScrollNav] = useState(false);
+
+  const changeNavBackground = () => {
+    if (window.scrollY >= 1) {
+      setScrollNav(true);
+    } else {
+      setScrollNav(false);
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("scroll", changeNavBackground);
+    return () => {
+      window.removeEventListener("scroll", changeNavBackground);
+    };
+  }, []);
+
+  const handleScrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
   return (
     <>
       <Navbar />
@@ -78,6 +98,14 @@ const ReturnExchangePolicy = () => {
           </p>
         </section>
       </div>
+      <button
+        onClick={handleScrollToTop}
+        className={`${scrollNav ? "block" : "hidden"
+          } fixed bottom-4 right-4 bg-[#F4C430] text-white rounded-full p-3 shadow-lg hover:bg-[#DAA520]`}
+        style={{ zIndex: 1000 }} // Ensure the button is on top
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="rgba(255,255,255,1)"><path d="M13.0001 7.82843V20H11.0001V7.82843L5.63614 13.1924L4.22192 11.7782L12.0001 4L19.7783 11.7782L18.3641 13.1924L13.0001 7.82843Z"></path></svg>
+      </button>
       <Footer />
     </>
   );
